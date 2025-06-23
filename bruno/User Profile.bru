@@ -1,0 +1,16 @@
+meta {
+  name: User Profile
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{BaseUrl}}/api/v1/users/current_user/
+  body: none
+  auth: inherit
+}
+
+body:multipart-form {
+  email: JohnDoe@example.com
+  password: hahaha123
+}

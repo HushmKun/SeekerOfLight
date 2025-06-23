@@ -1,0 +1,30 @@
+meta {
+  name: Login
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{BaseUrl}}/api/v1/users/login/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "JohnDoe@example.com",
+    "password": "hahaha123"
+  }
+}
+
+body:multipart-form {
+  email: JohnDoe@example.com
+  password: hahaha123
+}
+
+script:post-response {
+  let data = res.body;
+  bru.setEnvVar("access", data.access);
+  bru.setEnvVar("refresh", data.refresh);
+  
+}

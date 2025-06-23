@@ -1,0 +1,21 @@
+meta {
+  name: Refresh
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{BaseUrl}}/api/v1/users/refresh/
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  refresh: {{refresh}}
+}
+
+script:post-response {
+  let data = res.body;
+  bru.setEnvVar("access", data.access);
+  
+}

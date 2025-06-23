@@ -1,0 +1,13 @@
+[project]
+name = "seeker-of-light"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "aiosmtpd>=1.4.6",
+    "django>=5.2.3",
+    "djangorestframework>=3.16.0",
+    "djangorestframework-simplejwt>=5.5.0",
+    "pillow>=11.2.1",
+]

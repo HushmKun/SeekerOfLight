@@ -1,0 +1,22 @@
+meta {
+  name: User Profile - PATCH
+  type: http
+  seq: 9
+}
+
+patch {
+  url: {{BaseUrl}}/api/v1/users/current_user/
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "date_of_birth": "2001-01-01"
+  }
+}
+
+body:multipart-form {
+  email: JohnDoe@example.com
+  password: hahaha123
+}

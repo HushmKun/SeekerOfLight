@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "Seeker_Of_Light",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
