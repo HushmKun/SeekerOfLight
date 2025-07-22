@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("users", "0002_remove_user_avatar_remove_user_date_of_birth_and_more"),
     ]

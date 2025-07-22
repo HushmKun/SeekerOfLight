@@ -8,6 +8,7 @@ from .managers import UserManager
 
 # Create your models here.
 
+
 class User(AbstractBaseUser, PermissionsMixin):
     """
     A custom User model for Django projects that uses email as the unique identifier.
@@ -37,42 +38,43 @@ class User(AbstractBaseUser, PermissionsMixin):
         phone_number (CharField): The user's phone number.
     """
 
-    first_name = models.CharField(_('first name'), max_length=30)
-    last_name = models.CharField(_('last name'), max_length=30)
-    email = models.EmailField(_('email address'), unique=True)
-    date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
-    is_active = models.BooleanField(_('active'), default=False)
-    is_staff  = models.BooleanField(_("staff"), default=False)
+    first_name = models.CharField(_("first name"), max_length=30)
+    last_name = models.CharField(_("last name"), max_length=30)
+    email = models.EmailField(_("email address"), unique=True)
+    date_joined = models.DateTimeField(_("date joined"), auto_now_add=True)
+    is_active = models.BooleanField(_("active"), default=False)
+    is_staff = models.BooleanField(_("staff"), default=False)
     # avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
-    date_of_birth = models.DateField(_('date of birth'), null=True, blank=True)
+    date_of_birth = models.DateField(_("date of birth"), null=True, blank=True)
     country = CountryField(null=True)
     # phone_number = models.CharField(_("phone number"), max_length=15, null=True, blank=True)
 
     objects = UserManager()
 
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name", "date_of_birth"]
 
     class Meta:
-        verbose_name = _('user')
-        verbose_name_plural = _('users')
+        db_table = "user"
+        verbose_name = _("user")
+        verbose_name_plural = _("users")
 
     def get_full_name(self):
-        '''
+        """
         Returns the first_name plus the last_name, with a space in between.
-        '''
-        full_name = '%s %s' % (self.first_name, self.last_name)
+        """
+        full_name = "%s %s" % (self.first_name, self.last_name)
         return full_name.strip()
 
     def get_short_name(self):
-        '''
+        """
         Returns the short name for the user.
-        '''
+        """
         return self.first_name
 
     def email_user(self, subject, message, from_email=None, **kwargs):
-        '''
+        """
         Sends an email to this User.
-        '''
+        """
         # send_mail(subject, message, from_email, [self.email], **kwargs)
         print(message)

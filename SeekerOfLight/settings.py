@@ -15,7 +15,7 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-CONTENT_DIR = BASE_DIR / 'content'
+CONTENT_DIR = BASE_DIR / "content"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -38,12 +38,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
-
     # 1st Party Apps
     "users",
-
+    "core",
     # 3rd Party Apps
+    "django_countries",
 ]
 
 MIDDLEWARE = [
@@ -61,9 +60,7 @@ ROOT_URLCONF = "SeekerOfLight.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [
-            CONTENT_DIR / 'templates'
-        ],
+        "DIRS": [CONTENT_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -125,16 +122,16 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
-STATIC_ROOT = CONTENT_DIR / 'static'
+STATIC_ROOT = CONTENT_DIR / "static"
 
-STATICFILES_DIR = [ CONTENT_DIR / 'static' ]
+STATICFILES_DIR = [CONTENT_DIR / "static"]
 
 # Media files (Images, Uploads, etc...)
 # https://docs.djangoproject.com/en/5.2/topics/files/
 
-MEDIA_URL = 'media/'
+MEDIA_URL = "media/"
 
-MEDIA_ROOT = CONTENT_DIR / 'media'
+MEDIA_ROOT = CONTENT_DIR / "media"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -143,13 +140,13 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 # User Model
-AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = "users.User"
 
 
 # DRF Settings
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     )
 }
 
