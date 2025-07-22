@@ -5,3 +5,156 @@ auth {
 auth:bearer {
   token: {{access}}
 }
+
+docs {
+  ## API Documentation
+  
+  This API provides endpoints for user management, including registration, authentication, password management, and user profile operations.
+  
+  ### Base URL
+  
+  `{{BaseUrl}}/api/v1/users/`
+  
+  ### Authentication
+  
+  Most authenticated endpoints use a Bearer Token. 
+  The `access` token is set as an environment variable after successful login or token refresh.
+  
+  ### Endpoints
+  
+  #### 1\. Register a new user
+  
+    * **Name**: Register 
+    * **Method**: `POST` 
+    * **URL**: `{{BaseUrl}}/api/v1/users/register/` 
+    * **Authentication**: None 
+    * **Request Body (JSON)**: 
+      ```json
+      {
+        "email": "JohnDoe@example.com",
+        "password": "hahaha123",
+        "password2": "hahaha123",
+        "first_name": "John",
+        "last_name": "Doe",
+        "date_of_birth": "2004-01-01",
+        "country": "EG"
+      }
+      ```
+    * **Description**: Creates a new user account.
+  
+  #### 2\. User Login
+  
+    * **Name**: Login 
+    * **Method**: `POST` 
+    * **URL**: `{{BaseUrl}}/api/v1/users/login/` 
+    * **Authentication**: None 
+    * **Request Body (JSON)**: 
+      ```json
+      {
+        "email": "JohnDoe@example.com",
+        "password": "hahaha123"
+      }
+      ```
+    * **Post-response Script**: Sets `access` and `refresh` environment variables from the response body.
+    * **Description**: Authenticates a user and returns access and refresh tokens.
+  
+  #### 3\. Refresh Access Token
+  
+    * **Name**: Refresh 
+    * **Method**: `POST` 
+    * **URL**: `{{BaseUrl}}/api/v1/users/refresh/` 
+    * **Authentication**: Inherit 
+    * **Request Body (multipart-form)**: 
+      ```
+      refresh: {{refresh}}
+      ```
+    * **Post-response Script**: Sets the `access` environment variable from the response body.
+    * **Description**: Refreshes the access token using the refresh token.
+  
+  #### 4\. Change Password
+  
+    * **Name**: Change Password 
+    * **Method**: `POST` 
+    * **URL**: `{{BaseUrl}}/api/v1/users/change_password/` 
+    * **Authentication**: Inherit 
+    * **Request Body (JSON)**: 
+      ```json
+      {
+        "old_password": "hahaha123",
+        "new_password": "Fuckoff_123",
+        "new_password2": "Fuckoff_123"
+      }
+      ```
+    * **Description**: Allows an authenticated user to change their password.
+  
+  #### 5\. Reset Password (Request)
+  
+    * **Name**: Reset Password 
+    * **Method**: `POST` 
+    * **URL**: `{{BaseUrl}}/api/v1/users/reset_password/` 
+    * **Authentication**: None 
+    * **Request Body (JSON)**: 
+      ```json
+      {
+        "email": "JohnDoe@example.com"
+      }
+      ```
+    * **Post-response Script**: Sets `access` and `refresh` environment variables from the response body (this might be an error in the original file as reset password typically doesn't return tokens directly).
+    * **Description**: Initiates the password reset process for a given email.
+  
+  #### 6\. Reset Password (Confirm)
+  
+    * **Name**: Reset Password Confirm 
+    * **Method**: `POST` 
+    * **URL**: `{{BaseUrl}}/api/v1/users/reset_password/confirm/MQ/crujlo-e4f42efe634cc232f50abb723f18ac3e` 
+    * **Authentication**: None 
+    * **Request Body (JSON)**: 
+      ```json
+      {
+        "new_password": "hahaha123",
+        "new_password2": "hahaha123"
+      }
+      ```
+    * **Post-response Script**: Sets `access` and `refresh` environment variables from the response body.
+    * **Description**: Confirms the password reset with a unique ID and token, setting the new password.
+  
+  #### 7\. Get User Profile
+  
+    * **Name**: User Profile 
+    * **Method**: `GET` 
+    * **URL**: `{{BaseUrl}}/api/v1/users/current_user/` 
+    * **Authentication**: Inherit 
+    * **Description**: Retrieves the profile information of the current authenticated user.
+  
+  #### 8\. Update User Profile (PATCH)
+  
+    * **Name**: User Profile - PATCH 
+    * **Method**: `PATCH` 
+    * **URL**: `{{BaseUrl}}/api/v1/users/current_user/` 
+    * **Authentication**: Inherit 
+    * **Request Body (JSON)**: 
+      ```json
+      {
+        "date_of_birth": "2001-01-01",
+        "country": "EG"
+      }
+      ```
+    * **Description**: Partially updates the profile information of the current authenticated user.
+  
+  #### 9\. Update User Profile (PUT)
+  
+    * **Name**: User Profile - PUT 
+    * **Method**: `PUT` 
+    * **URL**: `{{BaseUrl}}/api/v1/users/current_user/` 
+    * **Authentication**: Inherit 
+    * **Request Body (JSON)**: 
+      ```json
+      {
+        "first_name": "John",
+        "last_name": "Doe",
+        "date_of_birth": "2004-01-01",
+        "country": "EG"
+      }
+      ```
+    * **Description**: Fully updates the profile information of the current authenticated user.
+}

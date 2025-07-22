@@ -2,6 +2,7 @@ from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django_countries.fields import CountryField
 
 from .managers import UserManager
 
@@ -36,17 +37,16 @@ class User(AbstractBaseUser, PermissionsMixin):
         phone_number (CharField): The user's phone number.
     """
 
-    # password = models.CharField(_("password"), max_length=128)
-    # last_login = models.DateTimeField(_("last login"), blank=True, null=True)
-    email = models.EmailField(_('email address'), unique=True)
     first_name = models.CharField(_('first name'), max_length=30)
     last_name = models.CharField(_('last name'), max_length=30)
+    email = models.EmailField(_('email address'), unique=True)
     date_joined = models.DateTimeField(_('date joined'), auto_now_add=True)
-    is_active = models.BooleanField(_('active'), default=True)
-    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
+    is_active = models.BooleanField(_('active'), default=False)
+    is_staff  = models.BooleanField(_("staff"), default=False)
+    # avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
     date_of_birth = models.DateField(_('date of birth'), null=True, blank=True)
-    phone_number = models.CharField(_("phone number"), max_length=15, null=True, blank=True)
-    is_staff  = models.BooleanField(_("is staff"), default=False)
+    country = CountryField(null=True)
+    # phone_number = models.CharField(_("phone number"), max_length=15, null=True, blank=True)
 
     objects = UserManager()
 
@@ -75,4 +75,4 @@ class User(AbstractBaseUser, PermissionsMixin):
         Sends an email to this User.
         '''
         # send_mail(subject, message, from_email, [self.email], **kwargs)
-        pass
+        print(message)

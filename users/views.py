@@ -18,21 +18,50 @@ from .serializers import (PasswordChangeSerializer, PasswordResetSerializer,
                           UserRegistrationSerializer, UserProfileSerializer)
 
 from .models import (User)
+
 # Create your views here.
 
+def uid_token(user:User) -> (str, str):
+
+    token = default_token_generator.make_token(user)
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    
+    return token , uid
+    
 class UserRegistrationView(APIView):
     def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.save()
-            # You can add logic here to generate a token for the new user if you want
-            return Response({
-                "message": "User registered successfully.",
-                "user_id": user.id,
-                "email": user.email
-            }, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            try:
+                user = serializer.save()
 
+                token, uid = uid_token(user)
+                    
+                reset_link = request.build_absolute_uri(
+                    reverse(
+                        "confirm_email", 
+                        kwargs= {
+                            'uidb64': uid, 
+                            'token':token
+                            }
+                        )
+                    )
+
+                user.email_user(
+                    subject='Email Activation Request',
+                    message=f'Hello, please use the following link to activate your account: {reset_link}',
+                    from_email='noreply@yourapi.com',
+                    fail_silently=False
+                )
+                    
+                return Response({
+                    "message": "User registered successfully.",
+                    "user_id": user.id,
+                    "email": user.email
+                }, status=status.HTTP_201_CREATED)
+            except:
+                Response({"error":"Server Failure"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class PasswordChangeView(APIView):
     """
@@ -56,7 +85,6 @@ class PasswordChangeView(APIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 class PasswordResetView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = PasswordResetSerializer(data=request.data)
@@ -66,8 +94,7 @@ class PasswordResetView(APIView):
                 user = User.objects.get(email=email)
                 
                 # Generate token
-                token = default_token_generator.make_token(user)
-                uid = urlsafe_base64_encode(force_bytes(user.pk))
+                token, uid = uid_token(user)
                 
                 # Construct reset link
                 reset_link = request.build_absolute_uri(
@@ -129,3 +156,20 @@ class UserProfileView(RetrieveUpdateAPIView):
         This method returns the user object that is associated with the current request.
         """
         return self.request.user
+
+class EmailVerification(APIView):
+    def post(self, request, uidb64, token):
+        try:
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+
+        if user is not None and default_token_generator.check_token(user, token):
+            user.is_active = True
+            user.save()
+            return Response({"message": "Email has been verified successfully."}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Verification link is invalid or has expired."}, status=status.HTTP_400_BAD_REQUEST)
+
+    

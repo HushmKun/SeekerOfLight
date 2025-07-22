@@ -1,7 +1,8 @@
 # In your_app/serializers.py
 
 from django.contrib.auth import get_user_model
-from rest_framework import serializers, validators
+from rest_framework import serializers
+from django_countries.serializer_fields import CountryField
 
 User = get_user_model()
 
@@ -11,7 +12,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email', 'password', 'password2']
+        fields = ['email', 'password', 'password2', 'first_name', 'last_name']
         extra_kwargs = {
             'password': {
                 'write_only': True, # Ensures password is not sent back in the response
@@ -31,7 +32,6 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         """
         Create and return a new `User` instance, given the validated data.
         """
-        # We don't want to save password2 to the database
         validated_data.pop('password2')
         
         # Use the create_user method to handle password hashing
@@ -79,7 +79,15 @@ class UserProfileSerializer(serializers.ModelSerializer):
     """
     Serializer for user profile object.
     """
+    country = CountryField()
+    
     class Meta:
         model = User
-        fields = ('id', 'email', 'first_name', 'last_name', 'date_of_birth')
+        fields = ('id', 'email', 'first_name', 'last_name', 'date_of_birth', 'country')
         read_only_fields = ('id', 'email')
+
+class EmailVerificationSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate(self, data):
+        return data
