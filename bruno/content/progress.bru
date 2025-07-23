@@ -1,0 +1,21 @@
+meta {
+  name: progress
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{BaseUrl}}/api/v1/content/progress/:id/
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 23
+}
+
+body:json {
+  {
+    "is_completed": true
+  }
+}

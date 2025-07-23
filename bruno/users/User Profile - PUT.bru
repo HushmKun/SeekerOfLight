@@ -1,10 +1,10 @@
 meta {
-  name: User Profile - PATCH
+  name: User Profile - PUT
   type: http
   seq: 9
 }
 
-patch {
+put {
   url: {{BaseUrl}}/api/v1/users/current_user/
   body: json
   auth: inherit
@@ -12,7 +12,9 @@ patch {
 
 body:json {
   {
-    "date_of_birth": "2001-01-01",
+    "first_name": "John",
+    "last_name": "Doe",
+    "date_of_birth": "2004-01-01",
     "country" : "EG"
   }
 }

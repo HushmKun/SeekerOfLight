@@ -1,0 +1,11 @@
+meta {
+  name: progress summary
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{BaseUrl}}/api/v1/content/progress/summary/
+  body: json
+  auth: inherit
+}

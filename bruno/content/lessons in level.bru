@@ -1,0 +1,15 @@
+meta {
+  name: lessons in level
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{BaseUrl}}/api/v1/content/levels/:id/lessons
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 4
+}
