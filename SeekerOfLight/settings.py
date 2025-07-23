@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     "core",
     # 3rd Party Apps
     "django_countries",
+    "rest_framework_simplejwt",
+
 ]
 
 MIDDLEWARE = [

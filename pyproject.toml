@@ -10,5 +10,6 @@ dependencies = [
     "django-countries>=7.6.1",
     "djangorestframework>=3.16.0",
     "djangorestframework-simplejwt>=5.5.0",
+    "lorem>=0.1.1",
     "pillow>=11.2.1",
 ]

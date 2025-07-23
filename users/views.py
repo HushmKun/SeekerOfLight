@@ -21,6 +21,8 @@ from .serializers import (
     UserProfileSerializer,
 )
 
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
 from .models import User
 
 # Create your views here.
@@ -206,3 +208,11 @@ class EmailVerification(APIView):
                 {"error": "Verification link is invalid or has expired."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+
+class LoginView(TokenObtainPairView):
+    pass 
+
+
+class RefreshView(TokenRefreshView):
+    pass 
