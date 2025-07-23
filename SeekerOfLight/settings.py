@@ -132,7 +132,7 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
-STATIC_ROOT = CONTENT_DIR / "static"
+STATIC_ROOT = CONTENT_DIR / "assets"
 
 STATICFILES_DIR = [CONTENT_DIR / "static"]
 
