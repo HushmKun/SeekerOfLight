@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import load_dotenv
+from os import environ
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,12 +25,12 @@ CONTENT_DIR = BASE_DIR / "content"
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "Lenovo_IDEAPAD-gaming_3_4GB_RTX_3050_16GB_RAM_500SSD."
+SECRET_KEY = environ.get("DJANGO_SECRET_KEY", "akhsgfbvv#$%^&laiuk@#T5Y276R1_uayTOVILHKGFKEA:lkjhgt><mnbvx-")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = environ.get("DJANGO_DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [environ.get("DJANGO_ALLOWED_HOST")]
 
 
 # Application definition
@@ -81,9 +85,13 @@ WSGI_APPLICATION = "SeekerOfLight.wsgi.application"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": CONTENT_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': environ.get("POSTGRES_DB"),                      
+        'USER': environ.get("POSTGRES_USER"),
+        'PASSWORD': environ.get("POSTGRES_PASSWORD"),
+        'HOST': environ.get("PGHOST"),
+        'PORT': int(environ.get("PGPORT")),
     }
 }
 

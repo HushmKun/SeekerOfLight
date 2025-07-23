@@ -12,4 +12,5 @@ dependencies = [
     "djangorestframework-simplejwt>=5.5.0",
     "lorem>=0.1.1",
     "pillow>=11.2.1",
+    "python-dotenv>=1.1.1",
 ]
