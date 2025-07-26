@@ -49,13 +49,13 @@ class PasswordChangeSerializer(serializers.Serializer):
     """
 
     old_password = serializers.CharField(
-        required=True, style={"input_type": "password"}
+        required=True, write_only=True, style={"input_type": "password"}
     )
     new_password = serializers.CharField(
-        required=True, style={"input_type": "password"}
+        required=True, write_only=True, style={"input_type": "password"}
     )
     new_password2 = serializers.CharField(
-        required=True, style={"input_type": "password"}
+        required=True, write_only=True, style={"input_type": "password"}
     )
 
     def validate_new_password(self, value):
@@ -71,6 +71,22 @@ class PasswordChangeSerializer(serializers.Serializer):
                 {"new_password": "The two password fields didn't match."}
             )
         return data
+    
+    def update(self, instance, validated_data):
+        # The 'instance' here is the user object provided by the view's get_object() method.
+        
+        # 1. Check the old password
+        if not instance.check_password(validated_data.get("old_password")):
+            # Raising a ValidationError will be automatically handled by DRF 
+            # and result in a 400 Bad Request response.
+            raise serializers.ValidationError({"old_password": "Wrong password."})
+
+        # 2. Set the new password
+        # The set_password method handles hashing.
+        instance.set_password(validated_data.get("new_password"))
+        instance.save()
+        
+        return instance
 
 
 class PasswordResetSerializer(serializers.Serializer):
@@ -80,6 +96,30 @@ class PasswordResetSerializer(serializers.Serializer):
 
     email = serializers.EmailField(required=True)
 
+    def save(self):
+        # The 'validated_data' is available here after '.is_valid()' is called.
+        email = self.validated_data['email']
+        
+        # The 'request' is passed from the view to the serializer's context.
+        request = self.context.get('request')
+
+        try:
+            user = User.objects.get(email=email)
+
+            token, uid = uid_token(user)
+
+            reset_link = request.build_absolute_uri(
+                reverse("reset_password_confirm", kwargs={"uidb64": uid, "token": token})
+            )
+
+            user.send_mail(
+                subject="Password Reset Request",
+                message=f"Hello, please use the following link to reset your password: {reset_link}",
+                fail_silently=False,
+            )
+        except User.DoesNotExist:
+            pass
+
 
 class PasswordResetConfirmSerializer(serializers.Serializer):
     """
@@ -88,6 +128,13 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
 
     new_password = serializers.CharField(required=True)
     new_password2 = serializers.CharField(required=True)
+
+    def validate_new_password(self, value):
+        if len(value) < 8 : 
+            raise serializers.ValidationError(
+                "Password must be at least 8 characters long."
+            )
+        return value
 
     def validate(self, data):
         if data["new_password"] != data["new_password2"]:

@@ -119,7 +119,7 @@ class UserProgressSummaryView(generics.ListAPIView):
 class NextLessonView(generics.RetrieveAPIView):
     """Get user's next recommended lesson"""
     permission_classes = [permissions.IsAuthenticated]
-    
+    serializer_class = LevelSerializer
     def get(self, request, *args, **kwargs):
         user = request.user
         next_lesson = self.get_next_lesson(user)

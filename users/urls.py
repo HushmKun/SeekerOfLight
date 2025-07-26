@@ -14,7 +14,7 @@ from .views import (
 urlpatterns = [
     path("register/", view=UserRegistrationView.as_view(), name="register"),
     path(
-        "confirm_email/<uidb64>/<token>/",
+        "confirm_email/<str:uidb64>/<str:token>/",
         view=EmailVerification.as_view(),
         name="confirm_email",
     ),
@@ -23,9 +23,9 @@ urlpatterns = [
     path("change_password/", view=PasswordChangeView.as_view(), name="change_password"),
     path("reset_password/", view=PasswordResetView.as_view(), name="reset_password"),
     path(
-        "reset_password/confirm/<uidb64>/<token>",
+        "reset_password/confirm/<str:uidb64>/<str:token>",
         view=PasswordResetConfirmView.as_view(),
         name="reset_password_confirm",
     ),
-    path("current_user/", view=UserProfileView.as_view(), name="profile"),
+    path("profile/", view=UserProfileView.as_view(), name="profile"),
 ]

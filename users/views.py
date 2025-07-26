@@ -8,11 +8,15 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveUpdateAPIView
-
+from rest_framework.generics import (
+    CreateAPIView, 
+    UpdateAPIView,
+    GenericAPIView
+)
 
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_str
-from .serializers import PasswordResetConfirmSerializer
+from .serializers import EmailVerificationSerializer, PasswordResetConfirmSerializer
 
 from .serializers import (
     PasswordChangeSerializer,
@@ -35,142 +39,141 @@ def uid_token(user: User) -> (str, str):
     return token, uid
 
 
-class UserRegistrationView(APIView):
-    def post(self, request):
-        serializer = UserRegistrationSerializer(data=request.data)
-        if serializer.is_valid():
-            try:
-                user = serializer.save()
+class UserRegistrationView(CreateAPIView):
+    """
+    User registration view using CreateAPIView for conciseness.
+    """
+    # The queryset is often used for list views, but it's good practice
+    # to include it for schema generation and other DRF features.
+    queryset = User.objects.first() 
+    serializer_class = UserRegistrationSerializer
 
-                token, uid = uid_token(user)
+    def create(self, request, *args, **kwargs):
+        """
+        Override the default create method to add custom logic:
+        1.  Validate data.
+        2.  Save the new user instance.
+        3.  Send a confirmation email.
+        4.  Return a custom success response.
+        """
+        serializer = self.get_serializer(data=request.data) # basedpyright: ignore
 
-                reset_link = request.build_absolute_uri(
-                    reverse("confirm_email", kwargs={"uidb64": uid, "token": token})
-                )
+        # Let DRF's exception handling manage the 400 Bad Request response
+        serializer.is_valid(raise_exception=True) 
 
-                user.email_user(
-                    subject="Email Activation Request",
-                    message=f"Hello, please use the following link to activate your account: {reset_link}",
-                    from_email="noreply@yourapi.com",
-                    fail_silently=False,
-                )
+        try:
+            # The .save() method will now trigger the serializer's .create() method
+            user = serializer.save()
 
-                return Response(
-                    {
-                        "message": "User registered successfully.",
-                        "user_id": user.id,
-                        "email": user.email,
-                    },
-                    status=status.HTTP_201_CREATED,
-                )
-            except:
-                Response(
-                    {"error": "Server Failure"},
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            # --- Your custom logic begins here ---
+            token, uid = uid_token(user)
+            confirm_link = request.build_absolute_uri(
+                reverse("confirm_email", kwargs={"uidb64": uid, "token": token})
+            )
+
+            user.email_user(
+                subject="Email Activation Request",
+                message=f"Hello, please use the following link to activate your account: {confirm_link}",
+                from_email="noreply@yourapi.com",
+                fail_silently=False,
+            )
+            # --- Your custom logic ends here ---
+
+            # Return your custom success response
+            return Response(
+                {
+                    "message": "User registered successfully. Please check your email to activate your account.",
+                    "user_id": user.id,
+                    "email": user.email,
+                },
+                status=status.HTTP_201_CREATED,
+            )
+        except Exception as e:
+            # You should ideally log the exception `e` here
+            # Note: Your original code had a bug here (no return statement).
+            return Response(
+                {"error": "A server error occurred, could not send confirmation email."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
-class PasswordChangeView(APIView):
+class PasswordChangeView(UpdateAPIView):
     """
     An endpoint for changing password.
     """
 
     permission_classes = (IsAuthenticated,)
+    serializer_class = PasswordChangeSerializer
+
+    def get_object(self):
+        """
+        Overrides the default get_object() to return the current user.
+        """
+        return self.request.user
+
+    def update(self, request, *args, **kwargs):
+        """
+        Overrides the default update method to provide a custom success message.
+        """
+        # The parent class's update method will perform the validation and save.
+        # It calls get_object() and uses the serializer_class.
+        super().update(request, *args, **kwargs)
+        
+        return Response(
+            {"message": "Password changed successfully."},
+            status=status.HTTP_200_OK
+        )
+
+
+class PasswordResetView(GenericAPIView):
+    """
+    An endpoint for initiating a password reset.
+    """
+    serializer_class = PasswordResetSerializer
 
     def post(self, request, *args, **kwargs):
-        serializer = PasswordChangeSerializer(data=request.data)
-        if serializer.is_valid():
-            user = request.user
-            # Check old password
-            if not user.check_password(serializer.data.get("old_password")):
-                return Response(
-                    {"old_password": ["Wrong password."]},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+        # We pass the request to the serializer's context to build the reset link.
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-            # set_password hashes the password
-            user.set_password(serializer.data.get("new_password"))
-            user.save()
+        # The '.save()' method now contains our email-sending logic.
+        serializer.save()
 
-            return Response(
-                {"message": "Password changed successfully."}, status=status.HTTP_200_OK
-            )
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # The security principle of always returning a success message is maintained.
+        return Response(
+            {"message": "If an account with this email exists, a password reset link has been sent."},
+            status=status.HTTP_200_OK,
+        )
 
 
-class PasswordResetView(APIView):
-    def post(self, request, *args, **kwargs):
-        serializer = PasswordResetSerializer(data=request.data)
-        if serializer.is_valid():
-            email = serializer.validated_data["email"]
-            try:
-                user = User.objects.get(email=email)
+class PasswordResetConfirmView(GenericAPIView):
+    """
+    View for confirming a password reset.
+    """
+    serializer_class = PasswordResetConfirmSerializer
 
-                # Generate token
-                token, uid = uid_token(user)
-
-                # Construct reset link
-                reset_link = request.build_absolute_uri(
-                    reverse(
-                        "reset_password_confirm", kwargs={"uidb64": uid, "token": token}
-                    )
-                )
-
-                # Send email
-                send_mail(
-                    subject="Password Reset Request",
-                    message=f"Hello, please use the following link to reset your password: {reset_link}",
-                    from_email="noreply@yourapi.com",
-                    recipient_list=[email],
-                    fail_silently=False,
-                )
-
-                # Always return a success response to prevent user enumeration attacks
-                return Response(
-                    {
-                        "message": "If an account with this email exists, a password reset link has been sent."
-                    },
-                    status=status.HTTP_200_OK,
-                )
-
-            except User.DoesNotExist:
-                # Still return a generic success message
-                return Response(
-                    {
-                        "message": "If an account with this email exists, a password reset link has been sent."
-                    },
-                    status=status.HTTP_200_OK,
-                )
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class PasswordResetConfirmView(APIView):
     def post(self, request, uidb64, token, *args, **kwargs):
-        serializer = PasswordResetConfirmSerializer(data=request.data)
-        if serializer.is_valid():
-            try:
-                uid = force_str(urlsafe_base64_decode(uidb64))
-                user = User.objects.get(pk=uid)
-            except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-                user = None
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-            if user is not None and default_token_generator.check_token(user, token):
-                user.set_password(serializer.validated_data["new_password"])
-                user.save()
-                return Response(
-                    {"message": "Password has been reset successfully."},
-                    status=status.HTTP_200_OK,
-                )
-            else:
-                return Response(
-                    {"error": "Reset link is invalid or has expired."},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+        try:
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if user is not None and default_token_generator.check_token(user, token):
+            user.set_password(serializer.validated_data["new_password"])
+            user.save()
+            return Response(
+                {"message": "Password has been reset successfully."},
+                status=status.HTTP_200_OK,
+            )
+        
+        return Response(
+            {"error": "Reset link is invalid or has expired."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
 
 class UserProfileView(RetrieveUpdateAPIView):
@@ -188,8 +191,10 @@ class UserProfileView(RetrieveUpdateAPIView):
         return self.request.user
 
 
-class EmailVerification(APIView):
-    def post(self, request, uidb64, token):
+class EmailVerification(GenericAPIView):
+    serializer_class = EmailVerificationSerializer
+
+    def post(self, request, uidb64:str, token:str):
         try:
             uid = force_str(urlsafe_base64_decode(uidb64))
             user = User.objects.get(pk=uid)

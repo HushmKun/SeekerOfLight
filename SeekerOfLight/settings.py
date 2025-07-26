@@ -47,8 +47,9 @@ INSTALLED_APPS = [
     "core",
     # 3rd Party Apps
     "django_countries",
+    "rest_framework",
     "rest_framework_simplejwt",
-
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -85,16 +86,25 @@ WSGI_APPLICATION = "SeekerOfLight.wsgi.application"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
+    "default": {},
+    'development': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': CONTENT_DIR / 'db.sqlite3',
+    },
+    'production': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': environ.get("POSTGRES_DB"),                      
         'USER': environ.get("POSTGRES_USER"),
         'PASSWORD': environ.get("POSTGRES_PASSWORD"),
-        'HOST': environ.get("PGHOST"),
-        'PORT': int(environ.get("PGPORT")),
+        'HOST': environ.get("POSTGRES_HOST"),
+        'PORT': int(environ.get("POSTGRES_PORT"))
     }
 }
 
+if DEBUG:
+    DATABASES['default'] = DATABASES['development']
+else:
+    DATABASES['default'] = DATABASES['production']
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -157,8 +167,21 @@ AUTH_USER_MODEL = "users.User"
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
-    )
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 # Email Settings
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+
+# DRF Spectacular 
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Seeker Of Light API',
+    'DESCRIPTION': 'XXXXXXXXXX',
+    'VERSION': '0.9',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
+}

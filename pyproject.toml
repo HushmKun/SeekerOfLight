@@ -10,11 +10,11 @@ dependencies = [
     "django-countries>=7.6.1",
     "djangorestframework>=3.16.0",
     "djangorestframework-simplejwt>=5.5.0",
+    "drf-spectacular>=0.28.0",
     "gunicorn>=23.0.0",
     "lorem>=0.1.1",
     "pillow>=11.2.1",
     "psycopg>=3.2.9",
     "psycopg-binary>=3.2.9",
     "python-dotenv>=1.1.1",
-    "whitenoise>=6.9.0",
 ]

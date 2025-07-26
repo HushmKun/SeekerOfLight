@@ -11,7 +11,7 @@ class LevelSerializer(serializers.ModelSerializer):
         model = Level
         fields = ['id', 'title', 'description', 'order_index', 'is_active', 'unlock_threshold', 'is_unlocked']
     
-    def get_is_unlocked(self, obj):
+    def get_is_unlocked(self, obj)-> bool :
         request = self.context.get('request')
         if request and request.user.is_authenticated:
             return obj.is_level_unlocked(request.user)
@@ -27,7 +27,7 @@ class LessonSerializer(serializers.ModelSerializer):
             'duration', 'order_index', 'video', 'user_progress'
         ]
     
-    def get_user_progress(self, obj):
+    def get_user_progress(self, obj)-> int:
         request = self.context.get('request')
         if request and request.user.is_authenticated:
             try:
