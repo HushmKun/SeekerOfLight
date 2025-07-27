@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 from dotenv import load_dotenv
 from os import environ
@@ -30,8 +31,7 @@ SECRET_KEY = environ.get("DJANGO_SECRET_KEY", "akhsgfbvv#$%^&laiuk@#T5Y276R1_uay
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = environ.get("DJANGO_DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = [environ.get("DJANGO_ALLOWED_HOST")]
-
+ALLOWED_HOSTS = [ _ for _ in environ.get('DJANGO_ALLOWED_HOST').split(",")]
 
 # Application definition
 
@@ -173,6 +173,12 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
+# Simple-JWT 
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(hours=12),
+}
+
 # Email Settings
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
@@ -180,8 +186,7 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 # DRF Spectacular 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Seeker Of Light API',
-    'DESCRIPTION': 'XXXXXXXXXX',
+    'DESCRIPTION': 'Django-based learning platform offering level-based content progression with JWT authentication and progress tracking.',
     'VERSION': '0.9',
     'SERVE_INCLUDE_SCHEMA': False,
-    # OTHER SETTINGS
 }

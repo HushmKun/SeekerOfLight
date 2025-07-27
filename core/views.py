@@ -1,7 +1,6 @@
 from django.utils import timezone
 from rest_framework import generics, status, permissions
 from rest_framework.response import Response
-from rest_framework.decorators import action
 from .models import Level, Lesson, UserProgress
 from .serializers import (
     BookmarkSerializer,
@@ -27,9 +26,7 @@ class LevelDetailView(generics.RetrieveAPIView):
     """Retrieve single level details"""
     serializer_class = LevelSerializer
     lookup_field = 'id'
-    
-    def get_queryset(self):
-        return Level.objects.filter(is_active=True)
+    queryset = Level.objects.filter(is_active=True)
     
     def get_serializer_context(self):
         return {'request': self.request}
@@ -41,7 +38,7 @@ class LevelLessonsView(generics.ListAPIView):
     def get_queryset(self):
         level_id = self.kwargs['id']
         return Lesson.objects.filter(
-            level__id=level_id
+            level__id=level_id, is_active=True
         ).order_by('order_index')
     
     def get_serializer_context(self):
@@ -116,24 +113,14 @@ class UserProgressSummaryView(generics.ListAPIView):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-class NextLessonView(generics.RetrieveAPIView):
+class NextLessonView(generics.GenericAPIView):
     """Get user's next recommended lesson"""
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class = LevelSerializer
+    serializer_class = LessonSerializer
+
     def get(self, request, *args, **kwargs):
-        user = request.user
-        next_lesson = self.get_next_lesson(user)
+        user = self.request.user
         
-        if not next_lesson:
-            return Response(
-                {"detail": "All lessons completed"}, 
-                status=status.HTTP_204_NO_CONTENT
-            )
-            
-        serializer = LessonSerializer(next_lesson, context={'request': request})
-        return Response(serializer.data)
-    
-    def get_next_lesson(self, user):
         # 1. Check last accessed incomplete lesson
         last_accessed = UserProgress.objects.filter(
             user=user,
@@ -141,7 +128,9 @@ class NextLessonView(generics.RetrieveAPIView):
         ).order_by('-last_accessed').first()
         
         if last_accessed:
-            return last_accessed.lesson
+            lesson = last_accessed.lesson
+            serializer = self.get_serializer(lesson)
+            return Response(serializer.data)
         
         # 2. Find first uncompleted lesson in first unlocked level
         for level in Level.objects.filter(is_active=True).order_by('order_index'):
@@ -154,10 +143,14 @@ class NextLessonView(generics.RetrieveAPIView):
             ).order_by('order_index').first()
             
             if lesson:
-                return lesson
+                serializer = self.get_serializer(lesson)
+                return Response(serializer.data)
         
-        return None
-
+        # No lessons found
+        return Response(
+            {"detail": "All lessons completed. Congratulations!"},
+            status=status.HTTP_204_NO_CONTENT
+        )
 class BookmarkedLessonsView(generics.ListAPIView):
     serializer_class = BookmarkSerializer
     
