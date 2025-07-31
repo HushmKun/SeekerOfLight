@@ -11,22 +11,26 @@ echo "Collect static files"
 uv run manage.py collectstatic --noinput
 
 # Apply database migrations
-echo "Apply database make migrations"
-uv run manage.py makemigrations 
+# echo "Checking database for new migrations"
+# uv run manage.py makemigrations 
 
 # Apply database migrations
 echo "Apply database migrations"
 uv run manage.py migrate 
 
+# Populate Database
+# echo "Populating database"
+# uv run manage.py populate_db 
 
-if [ $DJANGO_DEBUG -eq 1 ]; then 
+# Run Server
+if [ $GUNICORN -eq 0 ]; then 
     # Start Debug Server
     echo "Starting Development server"
     uv run manage.py runserver 0.0.0.0:8000
 fi
 
-if [ $DJANGO_DEBUG -eq 0 ]; then 
+if [ $GUNICORN -eq 1 ]; then 
     # Start Debug Server
     echo "Starting Production server"
-    gunicorn SeekerOfLight.wsgi:application --bind, 0.0.0.0:8000
+    uv run -m gunicorn SeekerOfLight.wsgi:application --bind 0.0.0.0:8000
 fi

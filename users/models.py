@@ -64,8 +64,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         """
         Returns the first_name plus the last_name, with a space in between.
         """
-        full_name = "%s %s" % (self.first_name, self.last_name)
-        return full_name.strip()
+        return f"{self.first_name} {self.last_name}".strip()
 
     def get_short_name(self):
         """
@@ -77,5 +76,5 @@ class User(AbstractBaseUser, PermissionsMixin):
         """
         Sends an email to this User.
         """
-        send_mail(subject, message, "noreplay@SoL.com", [self.email], **kwargs)
+        send_mail(subject, message, ["noreplay@SoL.com"], [self.email], **kwargs)
         print(message)

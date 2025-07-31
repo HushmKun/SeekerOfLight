@@ -45,7 +45,6 @@ class UserRegistrationView(CreateAPIView):
     """
     # The queryset is often used for list views, but it's good practice
     # to include it for schema generation and other DRF features.
-    queryset = User.objects.first() 
     serializer_class = UserRegistrationSerializer
 
     def create(self, request, *args, **kwargs):
@@ -74,7 +73,6 @@ class UserRegistrationView(CreateAPIView):
             user.email_user(
                 subject="Email Activation Request",
                 message=f"Hello, please use the following link to activate your account: {confirm_link}",
-                from_email="noreply@yourapi.com",
                 fail_silently=False,
             )
             # --- Your custom logic ends here ---
@@ -83,12 +81,12 @@ class UserRegistrationView(CreateAPIView):
             return Response(
                 {
                     "message": "User registered successfully. Please check your email to activate your account.",
-                    "user_id": user.id,
                     "email": user.email,
                 },
                 status=status.HTTP_201_CREATED,
             )
         except Exception as e:
+            print(e)
             # You should ideally log the exception `e` here
             # Note: Your original code had a bug here (no return statement).
             return Response(

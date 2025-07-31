@@ -29,9 +29,9 @@ CONTENT_DIR = BASE_DIR / "content"
 SECRET_KEY = environ.get("DJANGO_SECRET_KEY", "akhsgfbvv#$%^&laiuk@#T5Y276R1_uayTOVILHKGFKEA:lkjhgt><mnbvx-")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(environ.get("DJANGO_DEBUG", default=0))
+DEBUG = bool(int(environ.get("DJANGO_DEBUG", default=0)))
 
-ALLOWED_HOSTS = environ.get('DJANGO_ALLOWED_HOST', '127.0.0.1').split(",")
+ALLOWED_HOSTS = environ.get('DJANGO_ALLOWED_HOSTS', '127.0.0.1').split(",")
 
 # Application definition
 
@@ -86,12 +86,12 @@ WSGI_APPLICATION = "SeekerOfLight.wsgi.application"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    # "default": {},
-    'default': {
+    "default": {},
+    'dev': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': CONTENT_DIR / 'db.sqlite3',
     },
-    'production': {
+    'prod': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': environ.get("POSTGRES_DB"),                      
         'USER': environ.get("POSTGRES_USER"),
@@ -100,6 +100,11 @@ DATABASES = {
         'PORT': int(environ.get("POSTGRES_PORT"))
     }
 }
+
+if DEBUG : 
+    DATABASES['default'] = DATABASES['dev'] 
+else : 
+    DATABASES['default'] = DATABASES['prod'] 
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -184,4 +189,31 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'Django-based learning platform offering level-based content progression with JWT authentication and progress tracking.',
     'VERSION': '0.9',
     'SERVE_INCLUDE_SCHEMA': False,
+}
+
+# Logging Settings
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'verbose': {
+            'format': '%(asctime)s %(levelname)s [%(name)s:%(lineno)s] %(module)s %(process)d %(thread)d %(message)s'
+        }
+    },
+    'handlers': {
+        'gunicorn': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'formatter': 'verbose',
+            'filename': '/app/logs/gunicorn.errors',
+            'maxBytes': 1024 * 1024 * 100,  # 100 mb
+        }
+    },
+    'loggers': {
+        'gunicorn.errors': {
+            'level': 'DEBUG',
+            'handlers': ['gunicorn'],
+            'propagate': True,
+        },
+    }
 }
