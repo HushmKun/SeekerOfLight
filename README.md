@@ -89,17 +89,19 @@ python manage.py runserver
 Create .env file with these core settings:
 
 ```ini
-# Database
-DEBUG=True
-POSTGRES_DB=seeker
-POSTGRES_USER=admin
-POSTGRES_PASSWORD=securepassword
-POSTGRES_HOST=localhost
-POSTGRES_PORT=5432
+# Django Runtime Env
+DJANGO_SECRET_KEY="" # Insert Key here
+DJANGO_DEBUG=1
+DJANGO_ALLOWED_HOSTS="*,localhost"
+DJANGO_LOGLEVEL=info
 
-# Security
-SECRET_KEY=your_django_secret
-ALLOWED_HOSTS=localhost,127.0.0.1
+# Database 
+DATABASE_ENGINE="postgresql"
+POSTGRES_DB="dockerdjango" 
+POSTGRES_USER="dbuser" 
+POSTGRES_PASSWORD="yournewpass" 
+POSTGRES_HOST="django-db" 
+POSTGRES_PORT="5432"
 ```
 
 ## API Documentation 📖
