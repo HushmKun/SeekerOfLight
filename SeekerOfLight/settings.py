@@ -29,9 +29,9 @@ CONTENT_DIR = BASE_DIR / "content"
 SECRET_KEY = environ.get("DJANGO_SECRET_KEY", "akhsgfbvv#$%^&laiuk@#T5Y276R1_uayTOVILHKGFKEA:lkjhgt><mnbvx-")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = environ.get("DJANGO_DEBUG", "False") == "True"
+DEBUG = bool(environ.get("DJANGO_DEBUG", default=0))
 
-ALLOWED_HOSTS = [ _ for _ in environ.get('DJANGO_ALLOWED_HOST').split(",")]
+ALLOWED_HOSTS = environ.get('DJANGO_ALLOWED_HOST', '127.0.0.1').split(",")
 
 # Application definition
 
@@ -86,8 +86,8 @@ WSGI_APPLICATION = "SeekerOfLight.wsgi.application"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    "default": {},
-    'development': {
+    # "default": {},
+    'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': CONTENT_DIR / 'db.sqlite3',
     },
@@ -100,11 +100,6 @@ DATABASES = {
         'PORT': int(environ.get("POSTGRES_PORT"))
     }
 }
-
-if DEBUG:
-    DATABASES['default'] = DATABASES['development']
-else:
-    DATABASES['default'] = DATABASES['production']
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
