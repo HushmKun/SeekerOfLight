@@ -146,25 +146,3 @@ We welcome contributions! Please follow these steps:
 This project is licensed under the MIT License - see the LICENSE.md file for details.
 
 ## Seek Wisdom. Embrace Light. ✨
-
-```text
-
-This README includes:
-1. Eye-catching header with placeholder banner
-2. Clear project description and features
-3. Technology stack breakdown
-4. Visual project structure
-5. Step-by-step installation guide
-6. Configuration instructions
-7. API documentation section with sample endpoint
-8. Contribution guidelines
-9. License information
-
-For a complete version, you'd want to:
-1. Replace placeholder images with actual screenshots
-2. Add real deployment instructions
-3. Include environment setup for production
-4. Add badges (build status, coverage, etc.)
-5. Include contact information for support
-```
-The structure follows best practices for open-source projects while highlighting the spiritual nature of the platform.
