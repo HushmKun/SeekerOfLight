@@ -9,16 +9,16 @@ Seeker of Light is a Django-based learning platform that guides users through st
 
 ## Key Features ✨
 - **Structured Learning Paths**: Organized levels with unlock thresholds
-- **Multi-format Lessons**: Text, video, and interactive quizzes
+- **Multi-format Lessons**: Text, video, and interactive quizzes (coming soon)
 - **Progress Tracking**: Bookmarking and completion metrics
 - **Personalized Recommendations**: Next lesson suggestions
-- **Secure Authentication**: JWT & session-based auth with email verification
+- **Secure Authentication**: JWT-based auth with email verification
 - **Comprehensive API**: Full OpenAPI 3.0 documentation
 - **Responsive Design**: Ready for web and mobile clients
 
 ## Technology Stack 💻
 **Backend**
-- Python 3.10+
+- Python 3.13+
 - Django 5.2
 - Django REST Framework
 - PostgreSQL (Production), SQLite (Development)
@@ -54,9 +54,8 @@ seeker-of-light/
 ## Getting Started 🚀
 
 ### Prerequisites
-- Python 3.10+
+- Python 3.13+
 - PostgreSQL (for production)
-- Redis (optional for caching)
 
 ### Installation
 ```bash
@@ -73,7 +72,7 @@ pip install -r requirements.txt
 
 # Set up environment variables
 cp .env.sample .env
-nano .env  # Configure your settings
+vim .env  # Configure your settings
 
 # Run migrations
 python manage.py migrate
@@ -133,13 +132,9 @@ Interactive API docs are available at: http://localhost:8000/
 We welcome contributions! Please follow these steps:
 
 - Fork the repository
-
 - Create your feature branch (git checkout -b feature/amazing-feature)
-
 - Commit your changes (git commit -m 'Add amazing feature')
-
 - Push to the branch (git push origin feature/amazing-feature)
-
 - Open a pull request
 
 ## License 📄
