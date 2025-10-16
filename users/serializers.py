@@ -1,10 +1,21 @@
 # In your_app/serializers.py
 
 from django.contrib.auth import get_user_model
+from django.shortcuts import reverse
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+from django.contrib.auth.tokens import default_token_generator
 from rest_framework import serializers
 from django_countries.serializer_fields import CountryField
 
 User = get_user_model()
+
+
+def uid_token(user):
+    """Generate UID and token for password reset/email verification"""
+    token = default_token_generator.make_token(user)
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    return token, uid
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -112,7 +123,7 @@ class PasswordResetSerializer(serializers.Serializer):
                 reverse("reset_password_confirm", kwargs={"uidb64": uid, "token": token})
             )
 
-            user.send_mail(
+            user.email_user(
                 subject="Password Reset Request",
                 message=f"Hello, please use the following link to reset your password: {reset_link}",
                 fail_silently=False,
