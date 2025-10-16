@@ -45,7 +45,7 @@ class UserRegistrationView(CreateAPIView):
     """
     # The queryset is often used for list views, but it's good practice
     # to include it for schema generation and other DRF features.
-    queryset = User.objects.first() 
+    queryset = User.objects.all() 
     serializer_class = UserRegistrationSerializer
 
     def create(self, request, *args, **kwargs):
