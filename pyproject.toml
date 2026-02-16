@@ -1,20 +1,20 @@
 [project]
 name = "seeker-of-light"
-version = "0.1.0"
-description = "Add your description here"
+version = "1.0.0"
+description = "A structured learning platform for spiritual growth and personal development"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "aiosmtpd>=1.4.6",
-    "django>=5.2.3",
-    "django-countries>=7.6.1",
-    "djangorestframework>=3.16.0",
-    "djangorestframework-simplejwt>=5.5.0",
-    "drf-spectacular>=0.28.0",
-    "gunicorn>=23.0.0",
+    "django>=6.0.2",
+    "django-countries>=8.2.0",
+    "djangorestframework>=3.16.1",
+    "djangorestframework-simplejwt>=5.5.1",
+    "drf-spectacular>=0.29.0",
+    "gunicorn>=25.1.0",
     "lorem>=0.1.1",
-    "pillow>=11.2.1",
-    "psycopg>=3.2.9",
-    "psycopg-binary>=3.2.9",
-    "python-dotenv>=1.1.1",
+    "pillow>=12.1.1",
+    "psycopg>=3.3.2",
+    "psycopg-binary>=3.3.2",
+    "python-dotenv>=1.2.1",
 ]

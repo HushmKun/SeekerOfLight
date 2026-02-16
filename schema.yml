@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Seeker Of Light API
   version: 1.0.0
-  description: XXXXXXXXXX
+  description: A structured learning platform for spiritual growth and personal development
 paths:
   /accounts/change_password/:
     put:

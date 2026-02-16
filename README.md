@@ -1,8 +1,6 @@
+![Project Banner](https://dummyimage.com/800x200/000/35f50a&text=Seeker+Of+Light)
+
 # Seeker of Light 🌟
-
-![Project Banner](https://dummyimage.com/800x200/000/35f50a&text=Spiritual+Learning+Platform)
-
-> A structured learning platform for spiritual growth and personal development
 
 ## Overview
 Seeker of Light is a Django-based learning platform that guides users through structured content levels. Users progress through lessons, track their advancement, and unlock new levels as they gain wisdom. The platform features secure authentication, progress tracking, and a RESTful API for seamless integration.
@@ -19,7 +17,7 @@ Seeker of Light is a Django-based learning platform that guides users through st
 ## Technology Stack 💻
 **Backend**
 - Python 3.13+
-- Django 5.2
+- Django 6.0
 - Django REST Framework
 - PostgreSQL (Production), SQLite (Development)
 - JWT Authentication
